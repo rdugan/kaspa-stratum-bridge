@@ -3,6 +3,7 @@ package gostratum
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -65,7 +66,40 @@ func HandleAuthorize(ctx *StratumContext, event JsonRpcEvent) error {
 	var workerName string
 	if len(parts) >= 2 {
 		address = parts[0]
-		workerName = parts[1]
+
+		workerParts := strings.Split(parts[1], "=")
+		if len(workerParts) >= 2 {
+			workerName = workerParts[0]
+
+			configParts := strings.Split(workerParts[1], "+")
+			if len(configParts) >= 2 {
+				val, err := strconv.ParseFloat(configParts[0], 64)
+				if err == nil {
+					ctx.WorkerMinDiff = val
+				} else {
+					ctx.WorkerMinDiff = 0.0
+				}
+
+				val, err = strconv.ParseFloat(configParts[1], 64)
+				if err == nil {
+					ctx.workerJobRate = val
+				} else {
+					ctx.workerJobRate = 0.0
+				}
+			} else {
+				val, err := strconv.ParseFloat(workerParts[1], 64)
+				if err == nil {
+					ctx.WorkerMinDiff = val
+				} else {
+					ctx.WorkerMinDiff = 0.0
+				}
+				ctx.workerJobRate = 0.0
+			}
+		} else {
+			workerName = parts[1]
+			ctx.WorkerMinDiff = 0.0
+			ctx.workerJobRate = 0.0
+		}
 	}
 	var err error
 	address, err = CleanWallet(address)

@@ -126,10 +126,12 @@ func (c *clientListener) NewBlockAvailable(kapi *KaspaApi) {
 				state.initialized = true
 				state.useBigJob = bigJobRegex.MatchString(client.RemoteApp)
 				// first pass through send config/default difficulty
+				var minShareDiff float64
+				if client.WorkerMinDiff > 0 { minShareDiff = client.WorkerMinDiff } else { minShareDiff = c.minShareDiff }
 				state.stratumDiff = newKaspaDiff()
-				state.stratumDiff.setDiffValue(c.minShareDiff)
+				state.stratumDiff.setDiffValue(minShareDiff)
 				sendClientDiff(client, state)
-				c.shareHandler.setClientVardiff(client, c.minShareDiff)
+				c.shareHandler.setClientVardiff(client, minShareDiff)
 			} else {
 				varDiff := c.shareHandler.getClientVardiff(client)
 				if varDiff != state.stratumDiff.diffValue && varDiff != 0 {

@@ -545,6 +545,8 @@ func (sh *shareHandler) setClientVardiff(ctx *gostratum.StratumContext, minDiff 
 	// only called for initial diff setting, and clamping is handled during
 	// config load
 	previousMinDiff := updateVarDiff(stats, minDiff, false)
-	startVarDiff(stats)
+	if ctx.WorkerMinDiff == 0 {
+		startVarDiff(stats)
+	}
 	return previousMinDiff
 }

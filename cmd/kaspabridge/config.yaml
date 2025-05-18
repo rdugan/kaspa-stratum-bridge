@@ -20,7 +20,8 @@ kaspad_address: localhost:16110
 # Default value is chosen to accomodate current top of the line IceRiver ASICs.
 # If you don't want to change the default to match your device(s), the vardiff 
 # engine will adjust to an appropriate diff for lower hashrate devices within a 
-# few minutes.
+# few minutes. Can be overridden by the client in the worker field using the
+# format <address>.<worker>=<min_diff>+<max_job_rate>
 min_share_diff: 8192
 
 # pow2_clamp: restrict difficulty to 2^n (e.g. 64, 128, 256, etc). This is 
@@ -34,7 +35,8 @@ pow2_clamp: false
 # Starts with the value defined by the 'min_share_diff' setting, then checks 
 # every 10s whether each client is maintaining a 20 shares/minute submission 
 # rate, and sends an updated min diff per client if necessary.  Max tolerance 
-# is +/- 5% after 4hrs.
+# is +/- 5% after 4hrs.  Can be overridden by the client in the worker field 
+# using the format <address>.<worker>=<min_diff>+<max_job_rate>
 var_diff: true
 
 # shares_per_min: number of shares per minute the vardiff engine should target.
@@ -59,6 +61,11 @@ var_diff_stats: false
 # block_wait_time: time to wait since last new block message from kaspad before
 # manually requesting a new block.  Examples are '500ms', '3s', '1m', etc.
 block_wait_time: 3s
+
+# max_job_rate: maximum number of jobs per second to send to clients.  Default '0'
+# means no limit.  Can be overridden by the client in the worker field using the
+# format <address>.<worker>=<min_diff>+<max_job_rate>
+max_job_rate: 0
 
 # extranonce_size: size in bytes of extranonce, from 0 (no extranonce) to 3. 
 # With no extranonce (0), all clients will search through the same nonce-space,

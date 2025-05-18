@@ -26,6 +26,7 @@ type BridgeConfig struct {
 	UseLogFile      bool          `yaml:"log_to_file"`
 	HealthCheckPort string        `yaml:"health_check_port"`
 	BlockWaitTime   time.Duration `yaml:"block_wait_time"`
+	MaxJobRate      float64       `yaml:"max_job_rate"`
 	MinShareDiff    uint          `yaml:"min_share_diff"`
 	VarDiff         bool          `yaml:"var_diff"`
 	SharesPerMin    uint          `yaml:"shares_per_min"`
@@ -97,7 +98,11 @@ func ListenAndServe(cfg BridgeConfig) error {
 	if extranonceSize > 3 {
 		extranonceSize = 3
 	}
-	clientHandler := newClientListener(logger, shareHandler, minDiff, int8(extranonceSize))
+	jobRate := cfg.MaxJobRate
+	if jobRate < 0 {
+		jobRate = 0
+	}
+	clientHandler := newClientListener(logger, shareHandler, minDiff, jobRate, int8(extranonceSize))
 	handlers := gostratum.DefaultHandlers()
 	// override the submit handler with an actual useful handler
 	handlers[string(gostratum.StratumMethodSubmit)] =

@@ -29,12 +29,15 @@ type clientListener struct {
 	extranonceSize   int8
 	maxExtranonce    int32
 	nextExtranonce   int32
+	jobRate			 float64
+	lastJob          time.Time
 }
 
-func newClientListener(logger *zap.SugaredLogger, shareHandler *shareHandler, minShareDiff float64, extranonceSize int8) *clientListener {
+func newClientListener(logger *zap.SugaredLogger, shareHandler *shareHandler, minShareDiff float64, jobRate float64, extranonceSize int8) *clientListener {
 	return &clientListener{
 		logger:         logger,
 		minShareDiff:   minShareDiff,
+		jobRate:        jobRate,
 		extranonceSize: extranonceSize,
 		maxExtranonce:  int32(math.Pow(2, (8*math.Min(float64(extranonceSize), 3))) - 1),
 		nextExtranonce: 0,
@@ -84,6 +87,14 @@ func (c *clientListener) OnDisconnect(ctx *gostratum.StratumContext) {
 }
 
 func (c *clientListener) NewBlockAvailable(kapi *KaspaApi) {
+	// skip templates if new ones arrive within a threshold of the last one sent 
+	// out to not overload the machines with new jobs. KA Box, IR KS0s, etc 
+	// suffer reduced hashrates from higher job rates.
+	if c.lastJob.After(time.Now().Add(-time.Duration(1e9 / c.jobRate))) {
+		return
+	}
+	c.lastJob = time.Now()
+	
 	c.clientLock.Lock()
 	addresses := make([]string, 0, len(c.clients))
 	for _, cl := range c.clients {

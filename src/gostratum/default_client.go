@@ -76,29 +76,20 @@ func HandleAuthorize(ctx *StratumContext, event JsonRpcEvent) error {
 				val, err := strconv.ParseFloat(configParts[0], 64)
 				if err == nil {
 					ctx.WorkerMinDiff = val
-				} else {
-					ctx.WorkerMinDiff = 0.0
 				}
 
 				val, err = strconv.ParseFloat(configParts[1], 64)
 				if err == nil {
-					ctx.workerJobRate = val
-				} else {
-					ctx.workerJobRate = 0.0
+					ctx.WorkerJobRate = val
 				}
 			} else {
 				val, err := strconv.ParseFloat(workerParts[1], 64)
 				if err == nil {
 					ctx.WorkerMinDiff = val
-				} else {
-					ctx.WorkerMinDiff = 0.0
 				}
-				ctx.workerJobRate = 0.0
 			}
 		} else {
 			workerName = parts[1]
-			ctx.WorkerMinDiff = 0.0
-			ctx.workerJobRate = 0.0
 		}
 	}
 	var err error

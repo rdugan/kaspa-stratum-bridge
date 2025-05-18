@@ -20,7 +20,7 @@ type StratumContext struct {
 	WalletAddr    string
 	WorkerName    string
 	WorkerMinDiff float64
-	workerJobRate float64
+	WorkerJobRate float64
 	RemoteApp     string
 	Id            int32
 	Logger        *zap.Logger

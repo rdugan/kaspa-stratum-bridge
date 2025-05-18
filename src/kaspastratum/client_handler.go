@@ -29,15 +29,14 @@ type clientListener struct {
 	extranonceSize   int8
 	maxExtranonce    int32
 	nextExtranonce   int32
-	jobRate			 float64
-	lastJob          time.Time
+	maxJobRate       float64
 }
 
-func newClientListener(logger *zap.SugaredLogger, shareHandler *shareHandler, minShareDiff float64, jobRate float64, extranonceSize int8) *clientListener {
+func newClientListener(logger *zap.SugaredLogger, shareHandler *shareHandler, minShareDiff float64, maxJobRate float64, extranonceSize int8) *clientListener {
 	return &clientListener{
 		logger:         logger,
 		minShareDiff:   minShareDiff,
-		jobRate:        jobRate,
+		maxJobRate:     maxJobRate,
 		extranonceSize: extranonceSize,
 		maxExtranonce:  int32(math.Pow(2, (8*math.Min(float64(extranonceSize), 3))) - 1),
 		nextExtranonce: 0,
@@ -52,6 +51,8 @@ func (c *clientListener) OnConnect(ctx *gostratum.StratumContext) {
 
 	idx := atomic.AddInt32(&c.clientCounter, 1)
 	ctx.Id = idx
+	ctx.WorkerMinDiff = 0.0
+	ctx.WorkerJobRate = c.maxJobRate
 	c.clientLock.Lock()
 	if c.extranonceSize > 0 {
 		extranonce = c.nextExtranonce
@@ -87,22 +88,24 @@ func (c *clientListener) OnDisconnect(ctx *gostratum.StratumContext) {
 }
 
 func (c *clientListener) NewBlockAvailable(kapi *KaspaApi) {
-	// skip templates if new ones arrive within a threshold of the last one sent 
-	// out to not overload the machines with new jobs. KA Box, IR KS0s, etc 
-	// suffer reduced hashrates from higher job rates.
-	if c.jobRate > 0 && c.lastJob.After(time.Now().Add(-time.Duration(1e9 / c.jobRate))) {
-		return
-	}
-	c.lastJob = time.Now()
-	
 	c.clientLock.Lock()
 	addresses := make([]string, 0, len(c.clients))
 	for _, cl := range c.clients {
 		if !cl.Connected() {
 			continue
 		}
+	
 		go func(client *gostratum.StratumContext) {
 			state := GetMiningState(client)
+
+			// skip templates if new ones arrive within a threshold of the last
+			// one sent out to not overload the machines with new jobs. KA Box, 
+			// IR KS0s, etc suffer reduced hashrates from higher job rates.
+			if client.WorkerJobRate > 0 && state.lastJob.After(time.Now().Add(-time.Duration(1e9 / client.WorkerJobRate))) {
+				return
+			}
+			state.lastJob = time.Now()
+
 			if client.WalletAddr == "" {
 				if time.Since(state.connectTime) > time.Second*20 { // timeout passed
 					// this happens pretty frequently in gcp/aws land since script-kiddies scrape ports

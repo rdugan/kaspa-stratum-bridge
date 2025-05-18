@@ -21,6 +21,7 @@ type MiningState struct {
 	connectTime time.Time
 	stratumDiff *kaspaDiff
 	maxJobs     uint16
+	lastJob     time.Time
 }
 
 func MiningStateGenerator() any {

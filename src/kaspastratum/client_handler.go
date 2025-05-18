@@ -90,7 +90,7 @@ func (c *clientListener) NewBlockAvailable(kapi *KaspaApi) {
 	// skip templates if new ones arrive within a threshold of the last one sent 
 	// out to not overload the machines with new jobs. KA Box, IR KS0s, etc 
 	// suffer reduced hashrates from higher job rates.
-	if c.lastJob.After(time.Now().Add(-time.Duration(1e9 / c.jobRate))) {
+	if c.jobRate > 0 && c.lastJob.After(time.Now().Add(-time.Duration(1e9 / c.jobRate))) {
 		return
 	}
 	c.lastJob = time.Now()

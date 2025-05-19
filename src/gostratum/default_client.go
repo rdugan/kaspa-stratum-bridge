@@ -58,16 +58,15 @@ func HandleAuthorize(ctx *StratumContext, event JsonRpcEvent) error {
 	if len(event.Params) < 1 {
 		return fmt.Errorf("malformed event from miner, expected param[1] to be address")
 	}
-	address, ok := event.Params[0].(string)
+	addressParam, ok := event.Params[0].(string)
 	if !ok {
 		return fmt.Errorf("malformed event from miner, expected param[1] to be address string")
 	}
-	parts := strings.Split(address, ".")
-	var workerName string
-	if len(parts) >= 2 {
-		address = parts[0]
 
-		workerParts := strings.Split(parts[1], "=")
+	var workerName string
+	address, worker, workerFound := strings.Cut(addressParam, ".")
+	if workerFound {
+		workerParts := strings.Split(worker, "=")
 		if len(workerParts) >= 2 {
 			workerName = workerParts[0]
 
@@ -89,7 +88,7 @@ func HandleAuthorize(ctx *StratumContext, event JsonRpcEvent) error {
 				}
 			}
 		} else {
-			workerName = parts[1]
+			workerName = worker
 		}
 	}
 	var err error

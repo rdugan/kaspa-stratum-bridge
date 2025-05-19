@@ -234,6 +234,7 @@ Config parameters can also be specificied by command line flags, which have slig
   - '-sharespermin=20' # number of shares per minute the vardiff engine should target
   - '-vardiffstats=false' # include vardiff stats readout every 10s in log
   - '-extranonce=0' # size in bytes of extranonce
+  - '-maxjobrate=0' # maximum number of jobs per second to send to clients
   - '-blockwait=3s' # time in to wait before manually requesting new block
   - '-hcp=' # port at which healthcheck is exposed (at path '/readyz')
 ```
@@ -244,13 +245,15 @@ IceRiver ASICs require a 2 byte extranonce (extranonce_size=2), an increased min
 
 It is recommended to allow the variable difficulty engine to determine the proper diff setting per client (enabled by default), but if you prefer to set a fixed difficulty, disable vardiff, and consult the following table for the recommended settings for each of the different devices (should produce minimum 20 shares/min):
 
-|ASIC   | Min Diff |
-| ----- | ---- |
-|KS0    |   64 |
-|KS0PRO |  128 |
-|KS1    |  512 |
-|KS2    | 1024 |
-|KS3L/M | 2048 |
-|KS3    | 4096 |
+|ASIC     | Min Diff |
+| ------- | ---- |
+|KS0      |   64 |
+|KS0PRO   |  128 |
+|KS0ULTRA |  256 |
+|KS1/L    |  512 |
+|KS2/L    | 1024 |
+|KS3L/M   | 2048 |
+|KS3      | 4096 |
+|KS5      | 8192 |
 
 See previous sections for details on setting these parameters for your particular installation.

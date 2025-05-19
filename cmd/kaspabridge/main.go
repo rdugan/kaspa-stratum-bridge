@@ -30,7 +30,7 @@ func main() {
 	flag.BoolVar(&cfg.PrintStats, "stats", cfg.PrintStats, "true to show periodic stats to console, default `true`")
 	flag.StringVar(&cfg.RPCServer, "kaspa", cfg.RPCServer, "address of the kaspad node, default `localhost:16110`")
 	flag.DurationVar(&cfg.BlockWaitTime, "blockwait", cfg.BlockWaitTime, "time in ms to wait before manually requesting new block, default `3s`")
-	flag.Float64Var(&cfg.MaxJobRate, "jobrate", cfg.MaxJobRate, "max jobs per second sent to workers, default `0` (no limit)")
+	flag.Float64Var(&cfg.MaxJobRate, "maxjobrate", cfg.MaxJobRate, "max jobs per second sent to workers, default `0` (no limit)")
 	flag.UintVar(&cfg.MinShareDiff, "mindiff", cfg.MinShareDiff, "minimum share difficulty to accept from miner(s), default `4096`")
 	flag.BoolVar(&cfg.ClampPow2, "pow2clamp", cfg.ClampPow2, "true to limit diff to powers of 2, required for IceRiver/Bitmain ASICs, default `true`")
 	flag.BoolVar(&cfg.VarDiff, "vardiff", cfg.VarDiff, "true to enable auto-adjusting variable min diff, default `true`")

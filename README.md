@@ -39,7 +39,7 @@ Tips appreciated:
 
 ### Variable difficulty engine (vardiff)
 
-Multiple miners with significantly different hashrates can be connected to the same stratum bridge instance, and the appropriate difficulty will automatically be decided for each one.  Default settings target 20 shares/min, resulting in high confidence decisions regarding difficulty adjustments, and stable measured hashrates (1hr avg hashrates within +/- 10% of actual).  Difficulty can also be fixed by the individual miners via the worker field using the format `<address>.<worker>=<min_diff>+<max_job_rate>`
+Multiple miners with significantly different hashrates can be connected to the same stratum bridge instance, and the appropriate difficulty will automatically be decided for each one.  Default settings target 20 shares/min, resulting in high confidence decisions regarding difficulty adjustments, and stable measured hashrates (1hr avg hashrates within +/- 10% of actual).  Difficulty can also be fixed by the individual miners via the worker field using the format `<address>.<worker>=<min_diff>+<max_job_rate>`, which will take precedence over any server side difficulty settings.
 
 
 ### Maximum job rate control
@@ -249,7 +249,7 @@ Config parameters can also be specificied by command line flags, which have slig
 
 IceRiver ASICs require a 2 byte extranonce (extranonce_size=2), an increased minimum share difficulty (use vardiff, or see table below), and difficulty values limited to 2^n (pow2_clamp=true).  Without these settings, you may experience lower than expected hashrates and/or high invalid rates.  
 
-It is recommended to allow the variable difficulty engine to determine the proper diff setting per client (enabled by default), but if you prefer to set a fixed difficulty, disable vardiff, and consult the following table for the recommended settings for each of the different devices (should produce minimum 20 shares/min):
+It is recommended to allow the variable difficulty engine to determine the proper diff setting per client (enabled by default), but if you prefer to set a fixed difficulty, disable vardiff, and consult the following table for the recommended settings for each of the different devices (should produce minimum 20 shares/min).  Alternatively, you can set difficulty per miner, by adding the value to the worker field using the format `<address>.<worker>=<min_diff>+<max_job_rate>`, which will override vardiff (if enabled) just for that miner:
 
 |ASIC     | Min Diff |
 | ------- | ---- |

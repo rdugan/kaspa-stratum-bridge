@@ -39,12 +39,12 @@ Tips appreciated:
 
 ### Variable difficulty engine (vardiff)
 
-Multiple miners with significantly different hashrates can be connected to the same stratum bridge instance, and the appropriate difficulty will automatically be decided for each one.  Default settings target 20 shares/min, resulting in high confidence decisions regarding difficulty adjustments, and stable measured hashrates (1hr avg hashrates within +/- 10% of actual).  Difficulty can also be fixed by the individual miners via the worker field using the format <address>.<worker>=<min_diff>+<max_job_rate>
+Multiple miners with significantly different hashrates can be connected to the same stratum bridge instance, and the appropriate difficulty will automatically be decided for each one.  Default settings target 20 shares/min, resulting in high confidence decisions regarding difficulty adjustments, and stable measured hashrates (1hr avg hashrates within +/- 10% of actual).  Difficulty can also be fixed by the individual miners via the worker field using the format `<address>.<worker>=<min_diff>+<max_job_rate>`
 
 
 ### Maximum job rate control
 
-Some ASICs cannot handle the speed of jobs naturally issued according to the current network block rate of ~10/s. To allow these ASICs to function properly, a control has been added to define the maximum number of jobs per second to send to clients.  This can be configured server side, but unless throttling for network costs or server load, this is better left up to the individual miners, who can control the rate via the worker field using the format <address>.<worker>=<min_diff>+<max_job_rate>
+Some ASICs cannot handle the speed of jobs naturally issued according to the current network block rate of ~10/s. To allow these ASICs to function properly, a control has been added to define the maximum number of jobs per second to send to clients.  This can be configured server side, but unless throttling for network costs or server load, this is better left up to the individual miners, who can control the rate via the worker field using the format `<address>.<worker>=<min_diff>+<max_job_rate>`
 
 ### Optional monitoring UI
 

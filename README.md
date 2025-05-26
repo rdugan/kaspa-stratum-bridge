@@ -39,8 +39,12 @@ Tips appreciated:
 
 ### Variable difficulty engine (vardiff)
 
-Multiple miners with significantly different hashrates can be connected to the same stratum bridge instance, and the appropriate difficulty will automatically be decided for each one.  Default settings target 20 shares/min, resulting in high confidence decisions regarding difficulty adjustments, and stable measured hashrates (1hr avg hashrates within +/- 10% of actual).
+Multiple miners with significantly different hashrates can be connected to the same stratum bridge instance, and the appropriate difficulty will automatically be decided for each one.  Default settings target 20 shares/min, resulting in high confidence decisions regarding difficulty adjustments, and stable measured hashrates (1hr avg hashrates within +/- 10% of actual).  Difficulty can also be fixed by the individual miners via the worker field using the format <address>.<worker>=<min_diff>+<max_job_rate>
 
+
+### Maximum job rate control
+
+Some ASICs cannot handle the speed of jobs naturally issued according to the current network block rate of ~10/s. To allow these ASICs to function properly, a control has been added to define the maximum number of jobs per second to send to clients.  This can be configured server side, but unless throttling for network costs or server load, this is better left up to the individual miners, who can control the rate via the worker field using the format <address>.<worker>=<min_diff>+<max_job_rate>
 
 ### Optional monitoring UI
 
@@ -81,7 +85,7 @@ ks_worker_job_counter{ip="192.168.0.65",miner="BzMiner-v11.1.0",wallet="kaspa:qz
 
 ## Option 1: Build from source (native executable)
 
-* Install go 1.18 or later using whatever package manager is approprate for your system, or from https://go.dev/doc/install.
+* Install go 1.23 or later using whatever package manager is approprate for your system, or from https://go.dev/doc/install.
 
 * run `cd cmd/kaspabridge;go build .`
 
@@ -189,9 +193,11 @@ var_diff_stats: false
 # manually requesting a new block.  Examples are '500ms', '3s', '1m', etc.
 block_wait_time: 3s
 
-# max_job_rate: maximum number of jobs per second to send to clients.  Default '0'
-# means no limit.  Can be overridden by the client in the worker field using the
-# format <address>.<worker>=<min_diff>+<max_job_rate>
+# max_job_rate: maximum number of jobs per second to send to clients.  Default 
+# '0' means no limit.  Resulting rate will be as close as possible, but an
+# exact match is unlikely.  Unless throttling for network costs or server load, 
+# this is better left up to the individual miners, who can control via the 
+# worker field using the format <address>.<worker>=<min_diff>+<max_job_rate>
 max_job_rate: 0
 
 # extranonce_size: size in bytes of extranonce, from 0 (no extranonce) to 3. 

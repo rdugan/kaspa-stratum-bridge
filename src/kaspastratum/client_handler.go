@@ -98,10 +98,19 @@ func (c *clientListener) NewBlockAvailable(kapi *KaspaApi) {
 		go func(client *gostratum.StratumContext) {
 			state := GetMiningState(client)
 
-			// skip templates if new ones arrive within a threshold of the last
-			// one sent out to not overload the machines with new jobs. KA Box, 
-			// IR KS0s, etc suffer reduced hashrates from higher job rates.
-			if client.WorkerJobRate > 0 && state.lastJob.After(time.Now().Add(-time.Duration(1e9 / client.WorkerJobRate))) {
+			// job rate limiting... KA Box, IR KS0s, etc suffer reduced 
+			// hashrates from higher job rates.
+
+			// can't just divide 1s by jobs/s for the proper delay for some
+			// reason - maybe because of irregularity of network blocks?  
+			// equation below is best fit for observed delays => rates, from 
+			// painstaking regression analysis
+			jobRate := math.Sqrt(
+				((math.Exp(client.WorkerJobRate + 1.4) / 0.97) - 5.5) / 5.2)
+
+			if client.WorkerJobRate > 0 && 
+				state.lastJob.After(
+					time.Now().Add(-time.Duration(1e9 / jobRate))) {
 				return
 			}
 			state.lastJob = time.Now()
@@ -141,7 +150,11 @@ func (c *clientListener) NewBlockAvailable(kapi *KaspaApi) {
 				state.useBigJob = bigJobRegex.MatchString(client.RemoteApp)
 				// first pass through send config/default difficulty
 				var minShareDiff float64
-				if client.WorkerMinDiff > 0 { minShareDiff = client.WorkerMinDiff } else { minShareDiff = c.minShareDiff }
+				if client.WorkerMinDiff > 0 { 
+					minShareDiff = client.WorkerMinDiff 
+				} else { 
+					minShareDiff = c.minShareDiff 
+				}
 				state.stratumDiff = newKaspaDiff()
 				state.stratumDiff.setDiffValue(minShareDiff)
 				sendClientDiff(client, state)

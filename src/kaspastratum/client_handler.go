@@ -109,8 +109,7 @@ func (c *clientListener) NewBlockAvailable(kapi *KaspaApi) {
 				((math.Exp(client.WorkerJobRate + 1.4) / 0.97) - 5.5) / 5.2)
 
 			if client.WorkerJobRate > 0 && 
-				state.lastJob.After(
-					time.Now().Add(-time.Duration(1e9 / jobRate))) {
+				time.Since(state.lastJob) < time.Duration(1e9 / jobRate) {
 				return
 			}
 			state.lastJob = time.Now()
